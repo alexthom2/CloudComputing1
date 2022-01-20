@@ -28,7 +28,7 @@ library(lubridate)
 
 ```{r}
 
-data read from the 
+# data read from the 
 setwd("~/Data Science Masters/cloudcomputing/data")
 
 gpu <- read_csv("gpu.csv")
@@ -44,6 +44,8 @@ task <- read_csv("task-x-y.csv")
 ```{r}
 
 
+# reviewing the structure of the 3 data frames 
+
 str(gpu)
 
 
@@ -58,5 +60,38 @@ str(task)
 
 
 
+```
+
+
+
+
+The Data is made up of 3 data frames. Ther first the appacheck which is the action of the virtual machine at that precise time. GPU which is static data for the GPU and task identifies which precise pixel the virtual machine was rendering at the time of the task. The first thing to look at is how the individual takss are broken down 
+
+
+```{r}
+
+
+
+
+
+appcheck %>% group_by(jobId) %>%
+                              summarise(n = n())
+
+
+
+
+ appcheck %>% group_by(taskId) %>%
+                              summarise(n = n())
+
+
+
+appcheck %>% group_by(hostname) %>%
+                              summarise(n = n())
+
+
+```
+
+
+Jobid seems to not be too informative with only 3 levels. Taskid looks to be related to the generation of a pixel and looks to be the area that will be investigated. hostname is each GPU which we will be monitoring the performance of. 
 
 ```
