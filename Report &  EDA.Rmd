@@ -1,0 +1,62 @@
+---
+title: "Report"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Introduction 
+
+This project looks at a sample of data form the terapixel images cloude system for the newcastle urban oberservatory. The system is set up to be scalable depening on user demands and outpuits a 3d visualisation of newcastle city scentre. This project looks at the performance of the virtual machines and looks at developing a set of visualisations that can be regularly run to understand the current perofrmance of the system. Currently there is no set regime of perofmrance monitoring of the cloud based uystem and in order to improve user experiences by ensuring the system is fast and responsive for every user a set of visualisations will be developed 
+
+
+
+```{r}
+
+
+## packages used 
+library(tidyverse)
+
+library(lubridate)
+
+```
+
+
+
+```{r}
+
+data read from the 
+setwd("~/Data Science Masters/cloudcomputing/data")
+
+gpu <- read_csv("gpu.csv")
+
+appcheck <- read_csv("application-checkpoints.csv")
+
+task <- read_csv("task-x-y.csv")
+
+
+
+```
+
+```{r}
+
+
+str(gpu)
+
+
+
+str(appcheck)
+
+
+str(task)
+
+
+
+
+
+
+
+```
