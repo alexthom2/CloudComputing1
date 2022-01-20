@@ -257,7 +257,8 @@ full_data <- data %>% left_join(data_conf, by = c( "hostname", "taskId")) %>%
                           left_join(data_rend, by = c( "hostname", "taskId")) %>% 
                               left_join(data_tiling, by = c( "hostname", "taskId")) %>% 
                                 left_join(data_up, by = c( "hostname", "taskId")) %>% 
-                              left_join(task, by = "taskId")
+                              left_join(task, by = "taskId") %>% 
+                                
 
 
 ```
@@ -289,3 +290,35 @@ ggplot(full_data, aes(x = tiling_t)) + geom_histogram()
 
 
 ```
+
+
+
+
+```{r}
+
+
+ggplot(full_data,  aes(x = x, y = y, col = duration)) + geom_point()
+
+
+```
+
+
+
+```{r}
+
+
+shiny_dat <-  data %>% left_join(data_conf, by = c( "hostname", "taskId")) %>% 
+                          left_join(data_rend, by = c( "hostname", "taskId")) %>% 
+                              left_join(data_tiling, by = c( "hostname", "taskId")) %>% 
+                                left_join(data_up, by = c( "hostname", "taskId")) %>% 
+                              left_join(task, by = "taskId") %>% 
+                                select(timestamp.x, hostname, taskId, duration, Sconf_t, render_t, tiling_t, upload_t) %>% 
+                                      pivot_longer(cols = 4:8, names_to = "stage", values_to = "time")
+
+
+ggplot(shiny_dat, aes(x = stage, y= time)) + geom_jitter() + facet_wrap(~stage, scales = "free")
+
+
+
+```
+
