@@ -94,4 +94,52 @@ appcheck %>% group_by(hostname) %>%
 
 Jobid seems to not be too informative with only 3 levels. Taskid looks to be related to the generation of a pixel and looks to be the area that will be investigated. hostname is each GPU which we will be monitoring the performance of. 
 
+
+
+
+
+
+```{r}
+
+
+host_us <- appcheck %>%  filter(eventName == "TotalRender")  %>%
+                            arrange(timestamp) %>%
+                             group_by(hostname, taskId) %>%
+                            mutate(rown = 1:n()) %>%
+                              filter(rown == 1) 
+
+
+
+host_us_end <- appcheck %>%  filter(eventName == "TotalRender") %>%
+                                 arrange(timestamp) %>%
+                            group_by(hostname, taskId) %>%
+                               mutate(rown = 1:n()) %>%
+                              slice_max(rown) %>%
+                              select(timestamp, hostname, taskId)
+
+
+colnames(host_us_end)[1] <- "timeend"
+
+
+data <- host_us %>% left_join(host_us_end, by = c("hostname", "taskId")) %>%
+                            mutate(duration = timeend - timestamp)
+                             
+
+
+ggplot(data, aes(x = duration)) + geom_histogram()
+
+
+
+
+
+
+
+```
+
+There is a range of task runtimes from as low as 23 seconds to as high as 93 seconds with most full tasks taking around 40 seconds. This is the area to investigate further to understand the cause of the difference 
+
+
+
+
+
 ```
