@@ -142,4 +142,150 @@ There is a range of task runtimes from as low as 23 seconds to as high as 93 sec
 
 
 
+```{r}
+
+
+host_us <- appcheck %>%  filter(eventName == "Saving Config")  %>%
+                            arrange(timestamp) %>%
+                             group_by(hostname, taskId) %>%
+                            mutate(rown = 1:n()) %>%
+                              filter(rown == 1) 
+                          
+
+
+
+host_us_end <- appcheck %>%  filter(eventName == "Saving Config") %>%
+                                 arrange(timestamp) %>%
+                            group_by(hostname, taskId) %>%
+                               mutate(rown = 1:n()) %>%
+                              slice_max(rown) %>%
+                              select(timestamp, hostname, taskId) 
+
+
+colnames(host_us_end)[1] <- "timeend"
+
+
+data_conf <- host_us %>% left_join(host_us_end, by = c("hostname", "taskId")) %>%
+                            mutate(duration = timeend - timestamp) %>%
+                            select(timestamp, hostname, taskId, duration)
+
+colnames(data_conf)[4] <- "Sconf_t"
+
+
+host_us <- appcheck %>%  filter(eventName == "Tiling")  %>%
+                            arrange(timestamp) %>%
+                             group_by(hostname, taskId) %>%
+                            mutate(rown = 1:n()) %>%
+                              filter(rown == 1) 
+                          
+
+
+
+host_us_end <- appcheck %>%  filter(eventName == "Tiling") %>%
+                                 arrange(timestamp) %>%
+                            group_by(hostname, taskId) %>%
+                               mutate(rown = 1:n()) %>%
+                              slice_max(rown) %>%
+                              select(timestamp, hostname, taskId)
+
+
+colnames(host_us_end)[1] <- "timeend"
+
+
+data_tiling <- host_us %>% left_join(host_us_end, by = c("hostname", "taskId")) %>%
+                            mutate(duration = timeend - timestamp) %>%
+                            select(timestamp, hostname, taskId, duration)
+
+colnames(data_tiling)[4] <- "tiling_t"
+
+
+host_us <- appcheck %>%  filter(eventName == "Render")  %>%
+                            arrange(timestamp) %>%
+                             group_by(hostname, taskId) %>%
+                            mutate(rown = 1:n()) %>%
+                              filter(rown == 1) 
+                          
+
+
+
+host_us_end <- appcheck %>%  filter(eventName == "Render") %>%
+                                 arrange(timestamp) %>%
+                            group_by(hostname, taskId) %>%
+                               mutate(rown = 1:n()) %>%
+                              slice_max(rown) %>%
+                              select(timestamp, hostname, taskId)
+
+
+colnames(host_us_end)[1] <- "timeend"
+
+
+data_rend <- host_us %>% left_join(host_us_end, by = c("hostname", "taskId")) %>%
+                            mutate(duration = timeend - timestamp)  %>%
+                            select(timestamp, hostname, taskId, duration)
+
+colnames(data_rend)[4] <- "render_t"
+
+host_us <- appcheck %>%  filter(eventName == "Uploading")  %>%
+                            arrange(timestamp) %>%
+                             group_by(hostname, taskId) %>%
+                            mutate(rown = 1:n()) %>%
+                              filter(rown == 1) 
+                          
+
+
+
+host_us_end <- appcheck %>%  filter(eventName == "Uploading") %>%
+                                 arrange(timestamp) %>%
+                            group_by(hostname, taskId) %>%
+                               mutate(rown = 1:n()) %>%
+                              slice_max(rown) %>%
+                              select(timestamp, hostname, taskId)
+
+
+colnames(host_us_end)[1] <- "timeend"
+
+
+data_up <- host_us %>% left_join(host_us_end, by = c("hostname", "taskId")) %>%
+                            mutate(duration = timeend - timestamp)  %>%
+                            select(timestamp, hostname, taskId, duration)
+
+
+colnames(data_up)[4] <- "upload_t"
+
+
+full_data <- data %>% left_join(data_conf, by = c( "hostname", "taskId")) %>% 
+                          left_join(data_rend, by = c( "hostname", "taskId")) %>% 
+                              left_join(data_tiling, by = c( "hostname", "taskId")) %>% 
+                                left_join(data_up, by = c( "hostname", "taskId")) %>% 
+                              left_join(task, by = "taskId")
+
+
+```
+
+
+
+```{r}
+
+
+ggplot(full_data, aes(x = upload_t)) + geom_histogram()
+
+
+
+ggplot(full_data, aes(x = render_t)) + geom_histogram()
+
+
+
+
+ggplot(full_data, aes(x = Sconf_t)) + geom_histogram()
+
+
+
+
+
+ggplot(full_data, aes(x = tiling_t)) + geom_histogram()
+
+
+
+
+
 ```
