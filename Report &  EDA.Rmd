@@ -257,7 +257,7 @@ full_data <- data %>% left_join(data_conf, by = c( "hostname", "taskId")) %>%
                           left_join(data_rend, by = c( "hostname", "taskId")) %>% 
                               left_join(data_tiling, by = c( "hostname", "taskId")) %>% 
                                 left_join(data_up, by = c( "hostname", "taskId")) %>% 
-                              left_join(task, by = "taskId") %>% 
+                              left_join(task, by = "taskId")  
                                 
 
 
@@ -321,4 +321,26 @@ ggplot(shiny_dat, aes(x = stage, y= time)) + geom_jitter() + facet_wrap(~stage, 
 
 
 ```
+
+
+
+```{r}
+
+
+host_av <- full_data %>% group_by(hostname) %>% 
+                            summarise(meandur = mean(duration)) %>% 
+                              mutate(rank = rank(desc(meandur))) 
+
+full_data2 <- full_data %>% left_join(host_av, by = "hostname") %>% 
+                                filter(rank < 11) %>% 
+                                   select(timestamp.x, hostname, taskId, duration, Sconf_t, render_t, tiling_t, upload_t) %>% 
+  pivot_longer(cols = 4:8, names_to = "stage", values_to = "time") %>% 
+                                    mutate(sel = if_else(hostname == "dcc19f48bb3445a28338db3a8f002e9c00000S", "a", "b"))
+
+
+                                  
+```
+
+
+
 
