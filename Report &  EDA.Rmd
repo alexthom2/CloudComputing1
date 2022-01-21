@@ -10,7 +10,17 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introduction 
 
-This project looks at a sample of data form the terapixel images cloude system for the newcastle urban oberservatory. The system is set up to be scalable depening on user demands and outpuits a 3d visualisation of newcastle city scentre. This project looks at the performance of the virtual machines and looks at developing a set of visualisations that can be regularly run to understand the current perofrmance of the system. Currently there is no set regime of perofmrance monitoring of the cloud based uystem and in order to improve user experiences by ensuring the system is fast and responsive for every user a set of visualisations will be developed 
+This project looks at a sample of data form the terapixel images cloude system for the newcastle urban oberservatory. The system is set up to be scalable depening on user demands and outpuits a 3d visualisation of newcastle city scentre. This project looks at the performance of the virtual machines and looks at developing a set of visualisations that can be regularly run to understand the current perofrmance of the system. Currently there is no set regime of perofmrance monitoring of the cloud based uystem and in order to improve user experiences by ensuring the system is fast and responsive for every user a set of visualisations will be developed. The plan is to review the run times of the 1024 GPU nodes and identify nodes that have below average performance. 
+
+
+# Methods 
+
+The first task was to conduct an explortatory analysis of the data. The 3 data samples were read into R and first there structure and composition was reviewed. Columns which could be used to join data where identified. It was njoticed that the run times were listen so the data was split in order to calculate the run times of the stages. Once that was complete an unerstanding of the full run time for a render was calculated and a histogram plotted. Once this was complete and the difference in run times was observed furth clculation was done to see the times taken for the inividual tasks. Using this data the shiny application was created. Origionlly the plan was to be able to select any of the 1024 nodes however, this was too many for the selection so in the end the app is limited to the top 10 slowest nodes. On the app once the node is selected there is a summary of the time taken for each part of the render compared to other nodes so and understanding of whats delayed that particular node. Also a summary of the last few hours total render times for that node so an appreication of the general time taken for that node and it can be seen if the slow performance is consistent or if it was an isolated run of the virtual machine. 
+
+
+# Results 
+ 
+Overall i think this project is a good starting point to further refine the output dashboard to identify more critical pe
 
 
 
@@ -316,7 +326,7 @@ shiny_dat <-  data %>% left_join(data_conf, by = c( "hostname", "taskId")) %>%
                                       pivot_longer(cols = 4:8, names_to = "stage", values_to = "time")
 
 
-ggplot(shiny_dat, aes(x = stage, y= time)) + geom_jitter() + facet_wrap(~stage, scales = "free")
+ggplot(shiny_dat, aes(x = stage, y= time)) + geom_jitter(width = 0.1) + facet_wrap(stage~., scales = "free") + coord_flip()
 
 
 
@@ -332,15 +342,21 @@ host_av <- full_data %>% group_by(hostname) %>%
                               mutate(rank = rank(desc(meandur))) 
 
 full_data2 <- full_data %>% left_join(host_av, by = "hostname") %>% 
-                                filter(rank < 11) %>% 
                                    select(timestamp.x, hostname, taskId, duration, Sconf_t, render_t, tiling_t, upload_t) %>% 
-  pivot_longer(cols = 4:8, names_to = "stage", values_to = "time") %>% 
-                                    mutate(sel = if_else(hostname == "dcc19f48bb3445a28338db3a8f002e9c00000S", "a", "b"))
-
-
+  pivot_longer(cols = 4:8, names_to = "stage", values_to = "time") 
                                   
 ```
 
 
+```{r}
 
+
+
+fulldata3 <- full_data2 %>% filter(stage == "duration") %>% 
+                              filter(hostname == "db871cd77a544e13bc791a64a0c8ed5000000U")
+
+
+ggplot(fulldata3, aes(x = timestamp.x, y = time)) + geom_point()
+
+```
 

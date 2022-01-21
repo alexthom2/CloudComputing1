@@ -141,7 +141,7 @@ shiny_dat3 <- shiny_dat2 %>%
   pivot_longer(cols = 4:8, names_to = "stage", values_to = "time")
 
 
-
+cols <- c("a" = "#bd4b00", "b" = "#16004a")
 
 
 library(shiny)
@@ -162,8 +162,8 @@ ui <- fluidPage(
        
         # Show a plot of the generated distribution
         mainPanel(
-           plotOutput("plot1")
-        )
+           plotOutput("plot1"), 
+          plotOutput("plot2"))
     )
 ) 
 
@@ -176,13 +176,24 @@ server <- function(input, output) {
       mutate(sel = if_else(hostname == input$GPUinp, "a", "b"))
     
              
-    ggplot(highlighted, aes(x = stage, y= time, col = sel)) + geom_jitter() + facet_wrap(~stage, scales = "free")
+    ggplot(highlighted, aes(x = stage, y= time, col = sel)) + geom_jitter(size = 3) + 
+                                              facet_wrap(~stage, scales = "free") +
+                                                scale_color_manual(values = cols) +
+                                                    theme(panel.background = element_blank())
              
              
              
     
   })
  
+  output$plot2 <- renderPlot({
+    
+    selected <- shiny_dat3 %>% filter(hostname == input$GPUinp) %>% 
+                                    filter(stage == "duration")
+    
+    ggplot(selected, aes(x = timestamp.x, y = time, col = stage)) + geom_line()
+    
+  })
 
 }
 
