@@ -173,7 +173,8 @@ server <- function(input, output) {
 
   output$plot1 <- renderPlot({
     highlighted <-shiny_dat3 %>% 
-      mutate(sel = if_else(hostname == input$GPUinp, "a", "b"))
+      mutate(sel = if_else(hostname == input$GPUinp, "a", "b")) %>% 
+        filter(stage != "duration")
     
              
     ggplot(highlighted, aes(x = stage, y= time, col = sel)) + geom_jitter(size = 3) + 
